@@ -12,7 +12,7 @@ class TrieNode(object):
 
 
 
-class Trie:
+class Trie(object):
     
     
     def __init__(self):
