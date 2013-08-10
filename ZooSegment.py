@@ -30,11 +30,25 @@ class SMM(Segment):
         
 class FMM(SMM):
     
-    def __init__(self , **kargss):
-        pass
+
         
     def segment(self, words):
-        pass
+        _result = []
+        if words and len(words):
+            substring = words.decode("utf-8")
+            while len(substring):
+                subindex = self.maxlength
+                if subindex >len(substring):
+                    subindex = len(substring)
+                token = substring[:subindex]
+                rindex = len(token)
+                while  rindex > 1:
+                    if self._dict.search(token[:rindex]):
+                        break
+                    rindex = rindex - 1 
+                _result.append(token[:rindex])
+                substring = substring[len(token[:rindex]):]
+        return _result
 
 
 class RMM(SMM):
@@ -59,6 +73,6 @@ class RMM(SMM):
         return _result
     
 if __name__ == "__main__":
-    seg = RMM("dict.dat")
-    print " ".join(seg.segment("我爱中国共产党"))
+    seg = FMM("dict.dat")
+    print " ".join(seg.segment("我不爱中国共产党"))
     
