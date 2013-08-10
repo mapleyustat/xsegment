@@ -43,25 +43,18 @@ class RMM(SMM):
         _result = []
         if words and len(words):
             substring = words.decode("utf-8")
-            
             while len(substring):
                 subindex = self.maxlength
                 if subindex >len(substring):
                     subindex = len(substring)
                 token = substring[-subindex:]
-                rindex = len(token)
                 lindex = 0
-                while (rindex - lindex) > 0:
-                    _token = token[lindex:rindex]
-                    if self._dict.search(_token):
-                        _result.append(_token)
+                while  lindex < (len(token) - 1):
+                    if self._dict.search(token[lindex:]):
                         break
                     lindex = lindex + 1
-                if lindex == rindex:
-                    _result.append(token)
-                    substring = substring[:len(substring) - subindex]
-                else:
-                    substring = substring[:len(substring) - (lindex + 1)]
+                _result.append(token[lindex:])
+                substring = substring[:-len(token[lindex:])]
             _result.reverse()
         return _result
     
