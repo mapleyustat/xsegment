@@ -40,7 +40,8 @@ class Trie(object):
                 return False
             else:
                 node = node.children[word]
-                isFind = True
+                if node.value > -1:
+                    isFind = True
         return isFind
     
 if __name__ == "__main__":

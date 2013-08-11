@@ -24,8 +24,14 @@ class SMM(Segment):
         for word in contents:
             wordarry = word.split()
             self._dict.add(wordarry[0], wordarry[1])
-        #wait
-        
+    
+    
+    def signal_word_in(self,words):
+        count = 0
+        for word in words:
+            if len(word) == 1:
+                count = count + 1
+        return count         
         
         
 class FMM(SMM):
@@ -70,9 +76,45 @@ class RMM(SMM):
                 _result.append(token[lindex:])
                 substring = substring[:-len(token[lindex:])]
             _result.reverse()
+            
         return _result
+
+class BMM(SMM):
     
+    _fm = None
+    _rm = None
+    
+    def __init__(self,dictpath, maxlength):
+        SMM.__init__(self, dictpath, maxlength)
+        self._fm = FMM(dictpath,maxlength)
+        self._rm = RMM(dictpath,maxlength)
+        
+        
+    def segment(self, words):
+        fwords = self._fm.segment(words)
+        rwords = self._rm.segment(words)
+        minlen = len(fwords) - len(rwords)
+        if minlen > 0:
+            return rwords
+        elif minlen < 0:
+            return fwords
+        else:
+            diff_signal_word_num = self.signal_word_in(fwords) -  self.signal_word_in(rwords)
+            if diff_signal_word_num > 0:
+                return rwords
+            elif diff_signal_word_num < 0:
+                return fwords
+            else:
+                return rwords
+    
+
+        
+            
+        
+        
+        
+        
 if __name__ == "__main__":
     seg = FMM("dict.dat")
-    print " ".join(seg.segment("我不爱中国共产党"))
+    print " ".join(seg.segment("我爱中国共产党"))
     
