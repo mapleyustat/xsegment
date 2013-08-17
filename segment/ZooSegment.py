@@ -3,6 +3,8 @@
 
 from Trie import Trie
 import filetutil
+import re
+
 
 class Segment(object):
     
@@ -117,4 +119,6 @@ class BMM(SMM):
 if __name__ == "__main__":
     seg = FMM("dict.dat")
     print " ".join(seg.segment("我爱中国共产党"))
+    for i in  re.split("([\u4E00-\u9FA5]+)", "中华,名过111"):
+        print i
     
