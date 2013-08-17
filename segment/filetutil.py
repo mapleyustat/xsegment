@@ -62,7 +62,7 @@ def read_file_strip(filepath):
     _contents = _read(filepath)
     _newcontents = []
     for content in _contents:
-        _newcontents.append(content.strip())
+        _newcontents.append(content.strip().encode('UTF-8'))
     return _newcontents
 
 def read_file_line_format(filepath , formatfunction):

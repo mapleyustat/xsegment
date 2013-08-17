@@ -39,13 +39,18 @@ def tokenize(s):
     if pos != len(s):
         raise RuntimeError('Unexpected character %r on line %d' %(s[pos], line))
  
-statements = ''':=
-    IF quantity THEN
-        total := total..l + price * quantity...;
-        tax := price * 0.05;
-    ENDIF;
+statements = ''' abss x *
 '''
+def getWordSign(d):
+    if isinstance(d, dict):
+        for _key,_val in d.items():
+            if _val != None:
+                return (_val,_key)
+    return None
+def token(words):
+    for token in re.finditer(r"(?P<TOKEN>[a-z]+)|(?P<SIGN>[\.\+\*=]+)", words):
+        yield getWordSign(token.groupdict())
 
-for token in re.findall(r"\w+(?:[-']\w+)*|'|[-.(]+|\S\w*", statements):
-    print(token)
+for i in token(statements):
+    print i
 

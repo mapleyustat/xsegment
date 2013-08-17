@@ -3,7 +3,7 @@
 
 from Trie import Trie
 import filetutil
-import re
+from segment import PreSegment
 
 
 class Segment(object):
@@ -16,6 +16,7 @@ class Segment(object):
 class SMM(Segment):
     
     _dict = Trie()
+    
     def __init__(self , dictpath , maxlength=5):
         self.dictpath = dictpath
         self.maxlength = maxlength
@@ -33,14 +34,36 @@ class SMM(Segment):
         for word in words:
             if len(word) == 1:
                 count = count + 1
-        return count         
+        return count
+    
+    def segment(self,words):
+        _segmentwords = " "
+        for word in PreSegment.token(words):
+            print word
+            _segmentwords = _segmentwords +" " +self._segment(word)
+        return _segmentwords
+    
+    #解析中文分词 
+    def _znsegment(self,words):
+        pass
+    
+    #
+    def _segment(self,words):
+        if words:
+            if words[1] == 'ZN':
+                return self._znsegment(words[0])
+            else:
+                return  words[0]
+        return  ""
+        
+             
         
         
 class FMM(SMM):
     
 
         
-    def segment(self, words):
+    def _znsegment(self, words):
         _result = []
         if words and len(words):
             substring = words.decode("utf-8")
@@ -56,12 +79,12 @@ class FMM(SMM):
                     rindex = rindex - 1 
                 _result.append(token[:rindex])
                 substring = substring[len(token[:rindex]):]
-        return _result
+        return " ".join(_result)
 
 
 class RMM(SMM):
     
-    def segment(self, words):
+    def _znsegment(self, words):
         _result = []
         if words and len(words):
             substring = words.decode("utf-8")
@@ -79,14 +102,14 @@ class RMM(SMM):
                 substring = substring[:-len(token[lindex:])]
             _result.reverse()
             
-        return _result
+        return " ".join(_result)
 
 class BMM(SMM):
     
     _fm = None
     _rm = None
     
-    def __init__(self,dictpath, maxlength):
+    def __init__(self,dictpath=5, maxlength=5):
         SMM.__init__(self, dictpath, maxlength)
         self._fm = FMM(dictpath,maxlength)
         self._rm = RMM(dictpath,maxlength)
@@ -117,8 +140,7 @@ class BMM(SMM):
         
         
 if __name__ == "__main__":
-    seg = FMM("dict.dat")
-    print " ".join(seg.segment("我爱中国共产党"))
-    for i in  re.split("([\u4E00-\u9FA5]+)", "中华,名过111"):
-        print i
+    seg = BMM("dict.txt")
     
+    print seg.segment("如果数据确定是gbk或gb2312的话, 你可以参考:http://blog.csdn.net/heiyeshuwu/archive/2007/01/20/1488900.aspx")
+        
