@@ -33,7 +33,7 @@ class Trie(object):
     
     def search(self , words):
         node = self.root
-        isFind = True
+        isFind = False
         for word in words.decode("utf-8"):
             isFind = False
             if not node.children.has_key(word):

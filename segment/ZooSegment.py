@@ -17,7 +17,7 @@ class SMM(Segment):
     
     _dict = Trie()
     
-    def __init__(self , dictpath , maxlength=5):
+    def __init__(self , dictpath , maxlength=8):
         self.dictpath = dictpath
         self.maxlength = maxlength
         self._load_word_dict()
@@ -37,10 +37,13 @@ class SMM(Segment):
         return count
     
     def segment(self,words):
-        _segmentwords = " "
+        _segmentwords = []
         for word in PreSegment.token(words):
-            print word
-            _segmentwords = _segmentwords +" " +self._segment(word)
+            _words = self._segment(word)
+            if isinstance(_words, list):
+                _segmentwords.extend(_words)
+            else:
+                _segmentwords.append(_words)
         return _segmentwords
     
     #解析中文分词 
@@ -79,7 +82,7 @@ class FMM(SMM):
                     rindex = rindex - 1 
                 _result.append(token[:rindex])
                 substring = substring[len(token[:rindex]):]
-        return " ".join(_result)
+        return _result
 
 
 class RMM(SMM):
@@ -102,14 +105,14 @@ class RMM(SMM):
                 substring = substring[:-len(token[lindex:])]
             _result.reverse()
             
-        return " ".join(_result)
+        return _result
 
 class BMM(SMM):
     
     _fm = None
     _rm = None
     
-    def __init__(self,dictpath=5, maxlength=5):
+    def __init__(self,dictpath=8, maxlength=8):
         SMM.__init__(self, dictpath, maxlength)
         self._fm = FMM(dictpath,maxlength)
         self._rm = RMM(dictpath,maxlength)
@@ -140,7 +143,7 @@ class BMM(SMM):
         
         
 if __name__ == "__main__":
-    seg = BMM("dict.txt")
+    seg = FMM("dict.txt")
     
-    print seg.segment("如果数据确定是gbk或gb2312的话, 你可以参考:http://blog.csdn.net/heiyeshuwu/archive/2007/01/20/1488900.aspx")
+    print " ".join(seg.segment("如果不肯换位体验，能不能让他们失去位子？！否则他们永远不会懂得权力来自人民。 //@人民日报:【想听真话摸实情，不如换位体验】网友建议：请民航部门领导以普通乘客身份，体验飞机晚点的烦恼…...感同身受，换位思考，还有哪些地方需要领导去体验？欢迎补充〜"))
         
