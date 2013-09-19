@@ -38,6 +38,7 @@ class SMM(Segment):
     
     def segment(self,words):
         _segmentwords = []
+        words = words.decode("utf-8")
         for word in PreSegment.token(words):
             _words = self._segment(word)
             if isinstance(_words, list):
