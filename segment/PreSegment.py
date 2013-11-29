@@ -17,13 +17,11 @@ REGX_ARRY = [(
     ('ZN', ur"[\u4e00-\u9fa5]+"),
     ('EN', ur"[a-zA-Z]+")]
 
-#WORD_EXTRACT_REGX =ur"(?P<URL>http://([a-z]{1,}\.){2}[a-z]{1,}(/[a-z0-9]{1,}){0,}\.[a-z0-9]{1,})"+ur"|(?P<SIGN>[\.\+\*\=、。，“”\"]+)"+ur"|(?P<ZN>[\u4e00-\u9fa5]+)"+ur"|(?P<EN>([a-z])+)"+ur"|(?P<FLOAT>\d+\.\d+)"+ur"|(?P<INTEGER>[0-9]+)"
 
-# fileregx = [ regx.split("#")  for regx in
-# filetutil.read_file_strip("wordregx.txt")]
 WORD_EXTRACT_REGX = ur'|'.join(ur'(?P<%s>%s)' % (pair[0],pair[1]) for pair in REGX_ARRY)
 WORD_EXTRACT = re.compile(WORD_EXTRACT_REGX, re.U).finditer
-print WORD_EXTRACT_REGX
+
+
 
 
 def getWordSign(d):

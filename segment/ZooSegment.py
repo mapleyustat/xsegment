@@ -70,7 +70,7 @@ class FMM(SMM):
     def _znsegment(self, words):
         _result = []
         if words and len(words):
-            substring = words.decode("utf-8")
+            substring = words
             while len(substring):
                 subindex = self.maxlength
                 if subindex >len(substring):
@@ -91,7 +91,7 @@ class RMM(SMM):
     def _znsegment(self, words):
         _result = []
         if words and len(words):
-            substring = words.decode("utf-8")
+            substring = words
             while len(substring):
                 subindex = self.maxlength
                 if subindex >len(substring):
@@ -147,4 +147,5 @@ if __name__ == "__main__":
     seg = FMM("dict.txt")
 
     print " ".join(seg.segment("如果不肯换位体验，能不能让他们失去位子？！否则他们永远不会懂得权力来自人民。 //@人民日报:【想听真话摸实情，不如换位体验】网友建议：请民航部门领导以普通乘客身份，体验飞机晚点的烦恼…...感同身受，换位思考，还有哪些地方需要领导去体验？欢迎补充〜"))
+
 
