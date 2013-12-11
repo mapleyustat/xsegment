@@ -26,7 +26,7 @@ class Trie(object):
         return self.search(key)
 
     def add(self, words, value):
-        if not (words and isinstance(words, (str, unicode)) and value and isinstance(value, (int, float))):
+        if not (words and isinstance(words, (str, unicode)) and value and isinstance(value, (int, float,long,str))):
             return
         node = self.root
         for word in words.decode("utf-8"):
@@ -39,8 +39,6 @@ class Trie(object):
         node.value = value
 
     def search(self, words):
-        if not (words and isinstance(wrods, (str, unicode))):
-            return False
         node = self.root
         isFind = False
         for word in words.decode("utf-8"):
@@ -56,4 +54,4 @@ class Trie(object):
 if __name__ == "__main__":
     t = Trie()
     t.add("我爱天安门", 1)
-    print t == '天爱'
+    print t == '我爱'

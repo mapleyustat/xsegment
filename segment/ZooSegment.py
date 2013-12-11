@@ -20,12 +20,12 @@ class SMM(Segment):
     def __init__(self, dictpath, maxlength=8):
         self.word_dictpath = dictpath
         self.maxlength = maxlength
-        self._load_word_dict()
+        self.__load_word_dict()
 
     #载入词典
-    def _load_word_dict(self):
+    def __load_word_dict(self):
         with open(self.word_dictpath) as f:
-            [self.word_dict.add(word[0], word[1])
+            [self.word_dict.add(word[0], long(word[1]))
              for word in [line.strip().split() for line in f.readlines()]]
 
 
