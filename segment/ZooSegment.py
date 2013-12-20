@@ -26,7 +26,7 @@ class SMM(Segment):
         contents = filetutil.read_file_strip(self.dictpath)
         for word in contents:
             wordarry = word.split()
-            self._dict.add(wordarry[0], wordarry[1])
+            self._dict.add(wordarry[0].decode('utf-8'), wordarry[1])
 
 
     def signal_word_in(self,words):
@@ -144,7 +144,7 @@ class BMM(SMM):
 
 
 if __name__ == "__main__":
-    seg = FMM("dict.txt")
+    seg = FMM("dict/dict.txt")
 
     print " ".join(seg.segment("如果不肯换位体验，能不能让他们失去位子？！否则他们永远不会懂得权力来自人民。 //@人民日报:【想听真话摸实情，不如换位体验】网友建议：请民航部门领导以普通乘客身份，体验飞机晚点的烦恼…...感同身受，换位思考，还有哪些地方需要领导去体验？欢迎补充〜"))
 

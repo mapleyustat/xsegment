@@ -21,7 +21,9 @@ class Trie(object):
     
     def add(self , words , value):
         node = self.root
-        for word in words.decode("utf-8"):
+        if not words:
+            return 
+        for word in words:
             if node.children.has_key(word):
                 node = node.children[word]
             else:
@@ -34,7 +36,7 @@ class Trie(object):
     def search(self , words):
         node = self.root
         isFind = False
-        for word in words.decode("utf-8"):
+        for word in words:
             isFind = False
             if not node.children.has_key(word):
                 return False
@@ -43,16 +45,22 @@ class Trie(object):
                 if node.value > -1:
                     isFind = True
         return isFind
+
+    def find(self , words):
+        node = self.root
+        value = None
+        for word in words:
+            if not node.children.has_key(word):
+                return None
+            else:
+                node = node.children[word]
+                value = node.value
+        if value:
+            return value
+        else:
+            return words
     
 if __name__ == "__main__":
     t = Trie()
     t.add("我爱天安门", 1)
-    print t.search("他爱")
-    
-                
-        
-                
-                
-            
-        
-        
+    print t.find("我爱")
