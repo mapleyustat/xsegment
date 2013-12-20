@@ -1,25 +1,33 @@
-#coding=utf-8
+# coding=utf-8
 #!/usr/bin/env python
 
 
-
-
 class TrieNode(object):
-    
+
     def __init__(self):
         self.value = 0
         self.children = {}
 
 
-
 class Trie(object):
-    
-    
+
     def __init__(self):
         self.root = TrieNode()
-    
-    
-    def add(self , words , value):
+
+    def __eq__(self, word):
+        if word and isinstance(word, (str, unicode)):
+            return self.search(word)
+        return False
+
+    def __setitem__(self, key, value):
+        self.add(key, value)
+
+    def __getitem__(self, key):
+        return self.search(key)
+
+    def add(self, words, value):
+        if not (words and isinstance(words, (str, unicode)) and value and isinstance(value, (int, float,long,str))):
+            return
         node = self.root
         if not words:
             return 
@@ -31,9 +39,8 @@ class Trie(object):
                 node.children[word] = t
                 node = t
         node.value = value
-    
-    
-    def search(self , words):
+
+    def search(self, words):
         node = self.root
         isFind = False
         for word in words:
@@ -45,6 +52,7 @@ class Trie(object):
                 if node.value > -1:
                     isFind = True
         return isFind
+
 
     def find(self , words):
         node = self.root
@@ -64,3 +72,4 @@ if __name__ == "__main__":
     t = Trie()
     t.add("我爱天安门", 1)
     print t.find("我爱")
+
