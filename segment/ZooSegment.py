@@ -22,11 +22,11 @@ class SMM(Segment):
         self.maxlength = maxlength
         self.__load_word_dict()
 
-    def _load_word_dict(self ):
-        contents = filetutil.read_file_strip(self.dictpath)
+    def __load_word_dict(self ):
+        contents = filetutil.read_file_strip(self.word_dictpath)
         for word in contents:
             wordarry = word.split()
-            self._dict.add(wordarry[0].decode('utf-8'), wordarry[1])
+            self.word_dict.add(wordarry[0].decode('utf-8'), wordarry[1])
 
 
 
