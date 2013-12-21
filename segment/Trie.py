@@ -54,18 +54,22 @@ class Trie(object):
         return isFind
 
 
-    def find(self , words):
+    def find(self , words ,default = None ):
         node = self.root
         value = None
         for word in words:
+            value  = None
             if not node.children.has_key(word):
-                return None
+                value = None
+                break
             else:
                 node = node.children[word]
                 value = node.value
         if value:
             return value
         else:
+            if default:
+                return default
             return words
     
 if __name__ == "__main__":
