@@ -1,14 +1,22 @@
 #coding=utf-8
 
 import os
-import  SegmentException
 
 #文件操作类
-#    
-#
-#
-#
-#
+
+
+
+class SegmetException(Exception):
+    
+    def __init__(self,msg,code = None):
+        self.msg = msg
+        self.code = code
+    
+    
+    def __str__(self, *args, **kwargs):
+        if self.code:
+            return self.msg
+        return "%s,%s" % (self.msg , self.code)
 
 def _write(path,contents,mode):
     filehandle = open(path,mode)

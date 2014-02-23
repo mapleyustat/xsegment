@@ -14,21 +14,18 @@ class Segment(object):
 
 class SMM(Segment):
 
-    word_dict = Trie() #词典树
-
+    word_dict = Trie()  # 词典树
 
     def __init__(self, dictpath, maxlength=8):
         self.word_dictpath = dictpath
         self.maxlength = maxlength
         self.__load_word_dict()
 
-    def __load_word_dict(self ):
+    def __load_word_dict(self):
         contents = filetutil.read_file_strip(self.word_dictpath)
         for word in contents:
             wordarry = word.split()
             self.word_dict.add(wordarry[0].decode('utf-8'), wordarry[1])
-
-
 
     def signal_word_in(self, words):
         count = 0
@@ -137,5 +134,4 @@ class BMM(SMM):
 
 if __name__ == "__main__":
     seg = FMM("dict/dict.txt")
-
     print " ".join(seg.segment("如果不肯换位体验，能不能让他们失去位子？！否则他们永远不会懂得权力来自人民。 //@人民日报:【想听真话摸实情，不如换位体验】网友建议：请民航部门领导以普通乘客身份，体验飞机晚点的烦恼…...感同身受，换位思考，还有哪些地方需要领导去体验？欢迎补充〜"))
