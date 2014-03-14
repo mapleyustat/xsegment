@@ -27,3 +27,20 @@ zoo-segment 中文分词python分词
           print p.zh2pinyin('我爱a' , '#') # wo#ai#a
 
 
+情感极性简单分析
+---------------------
+:::python
+
+
+     from psentiment import SentimentTrie
+
+     sentiment = SentimentTrie()
+     print sentiment.get_word_sentiment('断章取义') # 返回值 -1.2 情感为负
+     print sentiment.get_words_sentiment(['我' , '喜欢' , '你']) #[('\xe6\x88\x91', 1.7499999999999998), ('\xe5\x96\x9c\xe6\xac\xa2', 1.4310722100656499), ('\xe4\xbd\xa0', -0.7)] 返回每个词的极值
+     print sentiment.get_sentence_sentiment(['我' , '喜欢' , '你']) # 返回2.48107221007 情感为积极
+     print sentiment.get_sentence_sentiment(['我' , '恨' , '你']) #-0.4392 情感为消极
+
++ 计算情感词的极值 ， 现在简单的实现
++ 必须要加入否定词概念 
++ 情感极性 ， 推荐svm训练
+
