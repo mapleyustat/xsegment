@@ -4,7 +4,7 @@
 from Trie import Trie
 import filetutil
 import PreSegment
-
+import os
 
 class Segment(object):
 
@@ -16,7 +16,7 @@ class SMM(Segment):
 
     word_dict = Trie()  # 词典树
 
-    def __init__(self, dictpath, maxlength=8):
+    def __init__(self, dictpath = os.path.join(os.path.abspath(os.path.dirname(__file__)) ,  'dict/dict.txt'), maxlength=8):
         self.word_dictpath = dictpath
         self.maxlength = maxlength
         self.__load_word_dict()

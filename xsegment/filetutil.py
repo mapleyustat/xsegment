@@ -6,7 +6,7 @@ import os
 
 
 
-class SegmetException(Exception):
+class SegmentException(Exception):
     
     def __init__(self,msg,code = None):
         self.msg = msg

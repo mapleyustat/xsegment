@@ -67,9 +67,10 @@ class SentimentTrie(object):
 if __name__ == '__main__':
 	sentiment = SentimentTrie()
 	print sentiment.get_word_sentiment('断章取义')
+	print sentiment.get_word_sentiment('不')
 	print sentiment.get_words_sentiment(['我' , '喜欢' , '你'])
 	print sentiment.get_sentence_sentiment(['我' , '喜欢' , '你'])
-	print sentiment.get_sentence_sentiment(['我' , '恨' , '你'])
+	print sentiment.get_sentence_sentiment(['我' , '不' , '恨' , '你'])
 
 
 

@@ -75,5 +75,5 @@ class Trie(object):
 if __name__ == "__main__":
     t = Trie()
     t.add("我爱天安门", 1)
-    print t.find("我爱")
+    print t.find("我爱天安门")
 
