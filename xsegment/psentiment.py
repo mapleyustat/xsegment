@@ -20,6 +20,8 @@ class SentimentTrie(object):
 
 
 	__sentiment_trie = Trie()
+	__non = set(['不' , ' 不是' , '没' , '几乎不','从不' ])
+
 
 	def __init__(self , dict_path = './dict/sentiment_word.txt' , split_word = '\t'):
 		self.__load(dict_path , split_word)
@@ -56,8 +58,14 @@ class SentimentTrie(object):
 
 	def get_sentence_sentiment(self , word_list = []):
 		sentiment_point = 0.
-		for __point in self.get_words_sentiment(word_list):
-			sentiment_point += __point[1]
+		non_num = 0 
+		for word in word_list:
+			if word in self.__non:
+				non_num += 1
+				continue
+			sentiment_point += self.get_word_sentiment(word)
+		if non_num % 2 != 0:
+			return  -sentiment_point
 		return sentiment_point
 
 
@@ -69,7 +77,7 @@ if __name__ == '__main__':
 	print sentiment.get_word_sentiment('断章取义')
 	print sentiment.get_word_sentiment('不')
 	print sentiment.get_words_sentiment(['我' , '喜欢' , '你'])
-	print sentiment.get_sentence_sentiment(['我' , '喜欢' , '你'])
+	print sentiment.get_sentence_sentiment(['我' ,'不' , '喜欢' , '你'])
 	print sentiment.get_sentence_sentiment(['我' , '不' , '恨' , '你'])
 
 
