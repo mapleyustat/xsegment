@@ -9,16 +9,19 @@ sys.setdefaultencoding('utf-8')
 
 
 class trainHmm(object):
-    state = defaultdict(int)
+    state = defaultdict(float)
+    # 为了防止被 0 除 出现异常 ， 则每个状态初始化为1。
     # 开始状态矩阵构建
-    start_state = {'s': 0, 'b': 0, 'm': 0, 'e': 0}
+    start_state = {'s': 1., 'b': 1., 'm': 1., 'e': 1.}
     # 隐藏状态转移
     transition_probability = {
-        's': {'s': 0,  'b': 0, 'm': 0, 'e': 0}, 'b': {'s': 0,  'b': 0, 'm': 0, 'e': 0},
-'m': {'s': 0,  'b': 0, 'm': 0, 'e': 0}, 'e': {'s': 0,  'b': 0, 'm': 0, 'e': 0}}
+        's': {'s': 1.,  'b': 1., 'm': 1., 'e': 1.}, 'b': {'s': 1.,  'b': 1., 'm': 1., 'e': 1.},
+'m': {'s': 1.,  'b': 1., 'm': 1., 'e': 1.}, 'e': {'s': 1.,  'b': 1., 'm': 1., 'e': 1.}}
     # 隐藏状态下各个观察状态发生频率
-    emission_probability = {'s': defaultdict(int), 'e': defaultdict(
-                            int), 'b': defaultdict(int), 'm': defaultdict(int)}
+    emission_probability = {'s': defaultdict(float), 'e': defaultdict(
+                            float), 'b': defaultdict(float), 'm': defaultdict(float)}
+
+    word_state = set()
 
     def save_state(self):
         with open('start_state.dat', 'w') as f:
@@ -54,9 +57,38 @@ class trainHmm(object):
                     self.transition_probability[
                         word_label[i][0]][word_label[i + 1][0]] += 1
                 for i in range(len(word_label)):
-                    self.state[word_label[i][0]] += 1
-                    self.emission_probability[
-                        word_label[i][0]][word_label[i][1]] += 1
+                	self.word_state.add(word_label[i][1])
+                	self.state[word_label[i][0]] += 1
+                	self.emission_probability[word_label[i][0]][word_label[i][1]] += 1
+        self.__translte()
+
+    def __translte(self):
+        '''
+        有状态数量转换为概率
+        '''
+        # 初始化矩阵数目
+        start_state_count = 0
+        for __value in self.start_state.values():
+            start_state_count += __value
+        # 计算开始状态概率
+        for __key in self.start_state.keys():
+            self.start_state[__key] = self.start_state[
+                __key] / start_state_count
+        # 初始化矩阵概率运算完毕
+
+        # 转移矩阵
+        for __state in self.transition_probability.keys():
+            for __afther_state in self.transition_probability[__state].keys():
+                # 计算公式 =》 p(Cj | Ci) = count(Ci,Cj) / count(Ci)
+                self.transition_probability[__state][__afther_state] = self.transition_probability[
+                    __state][__afther_state] / self.state[__state]
+
+         # 观察状态发生时候 隐藏状态发生概率
+        for __hide in self.emission_probability.keys():
+        	for word in self.word_state:
+        		self.emission_probability[__hide][word] = (self.emission_probability[__hide][word] + 1) / self.state[__hide] 
+
+
 
 
 t = trainHmm()
