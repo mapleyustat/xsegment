@@ -10,7 +10,7 @@ sys.setdefaultencoding('utf-8')
 
 class trainHmm(object):
     state = defaultdict(float)
-    __states = ['s' , 'm' ,'b' ,'e']
+    __states = ['s', 'm', 'b', 'e']
     # 为了防止被 0 除 出现异常 ， 则每个状态初始化为1。
     # 开始状态矩阵构建
     __start_state = {'s': 1., 'b': 1., 'm': 1., 'e': 1.}
@@ -98,11 +98,12 @@ class trainHmm(object):
                 self.__emission_probability[__hide][word] = (
                     self.__emission_probability[__hide][word] + 1) / self.state[__hide]
 
-    def viterbi(self, obs):
+    def __viterbi(self, obs):
         V = [{}]
         path = {}
         for y in self.__states:
-            V[0][y] = self.__start_state[y] * self.__emission_probability[y][obs[0]]
+            V[0][y] = self.__start_state[y] * \
+                self.__emission_probability[y][obs[0]]
             path[y] = [y]
         for t in range(1, len(obs)):
             V.append({})
@@ -116,9 +117,33 @@ class trainHmm(object):
         (prob, state) = max([(V[len(obs) - 1][y], y) for y in self.__states])
         return (prob, path[state])
 
+    def segment(self, sentence):
+        sentence = sentence.decode('utf-8')
+        __obs = self.__viterbi(sentence)[1]
+        word = []
+        __index = 0
+        __size = len(sentence)
+        while __index < __size:
+            if __obs[__index] == 's':
+                word.append(sentence[__index])
+                __index = __index + 1
+            elif __obs[__index] == 'b':
+                __word = []
+                while __obs[__index] != 'e':
+                    __word.append(sentence[__index])
+                    __index = __index + 1
+                __word.append(sentence[__index])
+                word.append(''.join(__word))
+                __index = __index + 1
+            else:
+                print __obs[__index]
+        return word
+
 
 if __name__ == '__main__':
     t = trainHmm()
     t.train('pku_training.utf8')
-    print t.viterbi([u'我', u'爱' , u'我' , u'的' , u'祖' , u'国' , u'。'])
+    # print t.segment([u'我', u'爱', u'我', u'的', u'祖', u'国', u'。'])
+    print ' '.join(t.segment(u'南京市长江大桥今天竣工！'))
+    print ' '.join(t.segment(u'李旭泽，想投奔搜狐新闻客户端可以联系我哈，我直送他们领导老蔡，哈哈。。'))
     t.save_state()
