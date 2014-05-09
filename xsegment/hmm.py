@@ -30,28 +30,25 @@ class HSegment(object):
 			__transition_probability = json.loads(f.readline())
 
 	def __viterbi(self, obs):
-		'''
-		维特比算法 摘自wiki 维特比算法
-		'''
 		V = [{}]
-        path = {}
-        for y in self.__states:
-            V[0][y] = self.__start_state[y] * \
-                self.__emission_probability[y][obs[0]]
-            path[y] = [y]
-        for t in range(1, len(obs)):
-            V.append({})
-            newpath = {}
-            for y in self.__states:
-                (prob, state) = max(
-                    [(V[t - 1][y0] * self.__transition_probability[y0][y] * self.__emission_probability[y][obs[t]], y0) for y0 in self.__states])
-                V[t][y] = prob
-                newpath[y] = path[state] + [y]
-            path = newpath
-        (prob, state) = max([(V[len(obs) - 1][y], y) for y in self.__states])
-        return (prob, path[state])
+		path = {}
+		for y in self.__states:
+			V[0][y] = self.__start_state[y] * \
+			    self.__emission_probability[y][obs[0]]
+			path[y] = [y]
+		for t in range(1, len(obs)):
+			V.append({})
+			newpath = {}
+			for y in self.__states:
+				(prob, state) = max(
+					[(V[t - 1][y0] * self.__transition_probability[y0][y] * self.__emission_probability[y][obs[t]], y0) for y0 in self.__states])
+				V[t][y] = prob
+				newpath[y] = path[state] + [y]
+			path = newpath
+		(prob, state) = max([(V[len(obs) - 1][y], y) for y in self.__states])
+		return (prob, path[state])
     
-    def segment(self , sentence):
+    def segment ( self , sentence ) :
     	if sentence :
     		if not isinstance(sentence , 'unicode'):
     			sentence = sentence.decode('utf-8')
