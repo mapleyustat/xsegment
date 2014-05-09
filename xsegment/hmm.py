@@ -23,54 +23,59 @@ class HSegment(object):
 			if not path.endswith('/'):
 				path = path + '/'
 		with open('%s%s' % (path, 'start_state.dat')) as f:
-			start_state = json.loads(f.readline())
-		with open('%s%s' % (path, 'emission_probability')) as f:
-			__emission_probability = json.loads(f.readline())
+			self.__start_state = json.loads(f.readline())
+		with open('%s%s' % (path, 'emission_probability.dat')) as f:
+			self.__emission_probability = json.loads(f.readline())
+			# print self.__emission_probability
 		with open('%s%s' % (path, 'transition_probability.dat')) as f:
-			__transition_probability = json.loads(f.readline())
-
+			self.__transition_probability = json.loads(f.readline())
+        
 	def __viterbi(self, obs):
-		V = [{}]
-		path = {}
-		for y in self.__states:
-			V[0][y] = self.__start_state[y] * \
-			    self.__emission_probability[y][obs[0]]
-			path[y] = [y]
-		for t in range(1, len(obs)):
-			V.append({})
-			newpath = {}
-			for y in self.__states:
-				(prob, state) = max(
-					[(V[t - 1][y0] * self.__transition_probability[y0][y] * self.__emission_probability[y][obs[t]], y0) for y0 in self.__states])
-				V[t][y] = prob
-				newpath[y] = path[state] + [y]
-			path = newpath
-		(prob, state) = max([(V[len(obs) - 1][y], y) for y in self.__states])
-		return (prob, path[state])
-    
-    def segment ( self , sentence ) :
-    	if sentence :
-    		if not isinstance(sentence , 'unicode'):
+	    '''
+	    特比算法 摘自wiki 维特比算法
+	    '''
+	    V = [{}]
+	    path = {}
+	    for y in self.__states:
+	    	V[0][y] = self.__start_state[y] * \
+	    	self.__emission_probability[y][obs[0]]
+	    	path[y] = [y]
+	    for t in range(1, len(obs)):
+	    	V.append({})
+	    	newpath = {}
+	    	for y in self.__states:
+	    	    (prob, state) = max(
+	    	    	[(V[t - 1][y0] * self.__transition_probability[y0][y] * self.__emission_probability[y][obs[t]], y0) for y0 in self.__states])
+	    	    V[t][y] = prob
+	    	    newpath[y] = path[state] + [y]
+	        path = newpath
+	    (prob, state) = max([(V[len(obs) - 1][y], y) for y in self.__states])
+	    return (prob, path[state])
+           
+        def segment(self , sentence):
+    	    if sentence :
+    		if not isinstance(sentence , unicode):
     			sentence = sentence.decode('utf-8')
-    	__obs = self.__viterbi(sentence)[1]
-        word = []
-        __index = 0
-        __size = len(sentence)
-        while __index < __size:
-            if __obs[__index] == 's':
-                word.append(sentence[__index])
-                __index = __index + 1
-            elif __obs[__index] == 'b':
-                __word = []
-                while __obs[__index] != 'e':
-                    __word.append(sentence[__index])
-                    __index = __index + 1
-                __word.append(sentence[__index])
-                word.append(''.join(__word))
-                __index = __index + 1
-            else:
-                print __obs[__index]
-        return word
+
+    	    __obs = self.__viterbi(sentence)[1]
+    	    word = []
+    	    __index = 0
+    	    __size = len(__obs)
+    	    while __index < __size:
+    	    	if __obs[__index] == 's':
+    	    	    word.append(sentence[__index])
+    	    	    __index = __index + 1
+    	    	elif __obs[__index] == 'b':
+    	    	    __word = []
+    	    	    while __obs[__index] != 'e':
+    	    	    	__word.append(sentence[__index])
+    	    	    	__index = __index + 1
+    	    	    __word.append(sentence[__index])
+    	    	    word.append(''.join(__word))
+    	    	    __index = __index + 1
+    	        else:
+    	       	   print __obs[__index]
+    	    return word
 
 
 class trainHmm(object):
@@ -168,8 +173,9 @@ class trainHmm(object):
 
     
 if __name__ == '__main__':
-	h = HSegment()
-	h.segment('我的分词软件!')
+	h = HSegment('dict/')
+	print ' '.join(h.segment(u'理想很远大，现实很骨干'))
+	print ' '.join(h.segment(u'作为程序员来说！努力是个球！,世界杯开赛！梅西很犀利!,世界卫生组织宣布！我了个去!梅花盛开在三月!腊月是个神奇的日子！'))
     # import os 
     # import re 
 
