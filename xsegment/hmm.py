@@ -28,52 +28,52 @@ class HSegment(object):
 			__emission_probability = json.loads(f.readline())
 		with open('%s%s' % (path, 'transition_probability.dat')) as f:
 			__transition_probability = json.loads(f.readline())
-
+        
 	def __viterbi(self, obs):
-		'''
-		维特比算法 摘自wiki 维特比算法
-		'''
-		V = [{}]
-        path = {}
-        for y in self.__states:
-            V[0][y] = self.__start_state[y] * \
-                self.__emission_probability[y][obs[0]]
-            path[y] = [y]
-        for t in range(1, len(obs)):
-            V.append({})
-            newpath = {}
-            for y in self.__states:
-                (prob, state) = max(
-                    [(V[t - 1][y0] * self.__transition_probability[y0][y] * self.__emission_probability[y][obs[t]], y0) for y0 in self.__states])
-                V[t][y] = prob
-                newpath[y] = path[state] + [y]
-            path = newpath
-        (prob, state) = max([(V[len(obs) - 1][y], y) for y in self.__states])
-        return (prob, path[state])
-    
-    def segment(self , sentence):
-    	if sentence :
+	    '''
+	    特比算法 摘自wiki 维特比算法
+	    '''
+	    V = [{}]
+	    path = {}
+	    for y in self.__states:
+	    	V[0][y] = self.__start_state[y] * \
+	    	self.__emission_probability[y][obs[0]]
+	    	path[y] = [y]
+	    for t in range(1, len(obs)):
+	    	V.append({})
+	    	newpath = {}
+	    	for y in self.__states:
+	    	    (prob, state) = max(
+	    	    	[(V[t - 1][y0] * self.__transition_probability[y0][y] * self.__emission_probability[y][obs[t]], y0) for y0 in self.__states])
+	    	    V[t][y] = prob
+	    	    newpath[y] = path[state] + [y]
+	   path = newpath
+	   (prob, state) = max([(V[len(obs) - 1][y], y) for y in self.__states])
+	   return (prob, path[state])
+           
+        def segment(self , sentence):
+    	    if sentence :
     		if not isinstance(sentence , 'unicode'):
     			sentence = sentence.decode('utf-8')
-    	__obs = self.__viterbi(sentence)[1]
-        word = []
-        __index = 0
-        __size = len(sentence)
-        while __index < __size:
-            if __obs[__index] == 's':
-                word.append(sentence[__index])
-                __index = __index + 1
-            elif __obs[__index] == 'b':
-                __word = []
-                while __obs[__index] != 'e':
-                    __word.append(sentence[__index])
-                    __index = __index + 1
-                __word.append(sentence[__index])
-                word.append(''.join(__word))
-                __index = __index + 1
-            else:
-                print __obs[__index]
-        return word
+    	    __obs = self.__viterbi(sentence)[1]
+    	    word = []
+    	    __index = 0
+    	    __size = len(sentence)
+    	    while __index < __size:
+    	    	if __obs[__index] == 's':
+    	    	    word.append(sentence[__index])
+    	    	    __index = __index + 1
+    	    	elif __obs[__index] == 'b':
+    	    	    __word = []
+    	    	    while __obs[__index] != 'e':
+    	    	    	__word.append(sentence[__index])
+    	    	    	__index = __index + 1
+    	    	    __word.append(sentence[__index])
+    	    	    word.append(''.join(__word))
+    	    	    __index = __index + 1
+    	       else:
+    	       	   print __obs[__index]
+    	  return word
 
 
 class trainHmm(object):
