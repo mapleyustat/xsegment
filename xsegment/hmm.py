@@ -3,6 +3,7 @@
 
 from collections import defaultdict
 import sys
+import os
 import json
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -15,25 +16,29 @@ class HSegment(object):
 	__transition_probability = None
 	__states = ['s', 'm', 'b', 'e']
 
-	def __init__(self, model='./'):
+	def __init__(self, model=os.path.join(os.path.abspath(os.path.dirname(__file__)),  'dict/')):
 		self.__load(model)
 
 	def __load(self, path):
+		print path
 		if path:
 			if not path.endswith('/'):
 				path = path + '/'
 		with open('%s%s' % (path, 'start_state.dat')) as f:
 			self.__start_state = json.loads(f.readline())
+			# print self.__start_state
 		with open('%s%s' % (path, 'emission_probability.dat')) as f:
 			self.__emission_probability = json.loads(f.readline())
 			# print self.__emission_probability
 		with open('%s%s' % (path, 'transition_probability.dat')) as f:
 			self.__transition_probability = json.loads(f.readline())
+			# print self.__transition_probability
         
 	def __viterbi(self, obs):
 	    '''
 	    特比算法 摘自wiki 维特比算法
 	    '''
+	    # print obs
 	    V = [{}]
 	    path = {}
 	    for y in self.__states:
@@ -58,6 +63,7 @@ class HSegment(object):
     			sentence = sentence.decode('utf-8')
 
     	    __obs = self.__viterbi(sentence)[1]
+    	    # print __obs
     	    word = []
     	    __index = 0
     	    __size = len(__obs)
@@ -173,7 +179,7 @@ class trainHmm(object):
 
     
 if __name__ == '__main__':
-	h = HSegment('dict/')
+	h = HSegment()
 	print ' '.join(h.segment(u'理想很远大，现实很骨干'))
 	print ' '.join(h.segment(u'作为程序员来说！努力是个球！,世界杯开赛！梅西很犀利!,世界卫生组织宣布！我了个去!梅花盛开在三月!腊月是个神奇的日子！'))
     # import os 
