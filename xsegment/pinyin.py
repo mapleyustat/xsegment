@@ -4,6 +4,7 @@
 from Trie import Trie
 import re
 import sys
+import os
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -13,7 +14,7 @@ class pinyin():
     __zh = re.compile(ur"([\u4E00-\u9FA5]+)")
     __dict = Trie()
 
-    def __init__(self, dict_path='dict/word.data'):
+    def __init__(self, dict_path=os.path.join(os.path.abspath(os.path.dirname(__file__)) , 'dict/word.data')):
         self.__load(dict_path)
 
     def __load(self, dict_path):
