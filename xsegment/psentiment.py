@@ -4,6 +4,7 @@
 
 
 from Trie import Trie
+import os
 
 def singleton(cls, *args, **kw):   
     instances = {}   
@@ -23,13 +24,12 @@ class SentimentTrie(object):
 	__non = set(['不' , ' 不是' , '没' , '几乎不','从不' ])
 
 
-	def __init__(self , dict_path = './dict/sentiment_word.txt' , split_word = '\t'):
+	def __init__(self , dict_path = os.path.join(os.path.abspath(os.path.dirname(__file__)) ,'dict/sentiment_word.txt'), split_word = '\t'):
 		self.__load(dict_path , split_word)
 
 
 
 	def __load(self , dict_path , split_word = '\t'):
-		print 'load'
 		with open(dict_path) as __file_handle:
 			for line in __file_handle.readlines():
 				line = line.strip()

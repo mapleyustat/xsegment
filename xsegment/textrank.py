@@ -24,8 +24,18 @@ class TextRank(object):
         word_arry = TextRank.createList(word_len , word_len)
         for i in range(1, len(sententce)):
         	word_arry[word_map[sententce[i]]][word_map[sententce[i-1]]] += 1
+
+
+        #生成初始化矩阵
+        for j in range(word_len):
+        	noZero = 0
+        	for i in range(word_len):
+        		if word_arry[i][j] != 0:
+        			noZero += 1
+        	if noZero !=0:
+        		for i in range(word_len):
+        			word_arry[i][j] /= float(noZero)
         print word_arry
-            
 
     def __create_word_map(self, sententce):
         word_map = {}
@@ -52,4 +62,4 @@ class TextRank(object):
 if __name__ == '__main__':
     x = TextRank()
     print TextRank.createList(3, 4)[2][1]
-    x.extractWord('我 说 你 应该  知道 我')
+    x.extractWord('我 说 你 应该  知道 我 , 你 说 你 知道 什么')
