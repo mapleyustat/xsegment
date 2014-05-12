@@ -12,12 +12,14 @@ import re
 
 
 class HSegment(object):
-	__start_state = None
-	__emission_probability = None
-	__transition_probability = None
-	__states = ['s', 'm', 'b', 'e']
-
-	def __init__(self, model=os.path.join(os.path.abspath(os.path.dirname(__file__)),  'dict/')):
+    __start_state = None
+    __emission_probability = None
+    __transition_probability = None
+    __states = ['s', 'm', 'b', 'e']
+    
+    
+    
+    def __init__(self, model=os.path.join(os.path.abspath(os.path.dirname(__file__)),  'dict/')):
 		self.__load(model)
 
 
@@ -27,7 +29,7 @@ class HSegment(object):
         return self.__split
 
 
-	def __load(self, path):
+    def __load(self, path):
 		print path
 		if path:
 			if not path.endswith('/'):
@@ -42,7 +44,7 @@ class HSegment(object):
 			self.__transition_probability = json.loads(f.readline())
 			# print self.__transition_probability
         
-	def __viterbi(self, obs):
+    def __viterbi(self, obs):
 	    '''
 	    特比算法 摘自wiki 维特比算法
 	    '''
