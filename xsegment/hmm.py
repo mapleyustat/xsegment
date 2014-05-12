@@ -7,6 +7,7 @@ import os
 import json
 reload(sys)
 sys.setdefaultencoding('utf-8')
+import re
 
 
 
@@ -19,18 +20,25 @@ class HSegment(object):
 	def __init__(self, model=os.path.join(os.path.abspath(os.path.dirname(__file__)),  'dict/')):
 		self.__load(model)
 
+
+    def split(self , sentence):
+        if not self.__split:
+            self.__split = re.compile('\\s+')
+        return self.__split
+
+
 	def __load(self, path):
 		print path
 		if path:
 			if not path.endswith('/'):
 				path = path + '/'
-		with open('%s%s' % (path, 'start_state.dat')) as f:
+		with open('%s%s' % (path, 'start_state.txt')) as f:
 			self.__start_state = json.loads(f.readline())
 			# print self.__start_state
-		with open('%s%s' % (path, 'emission_probability.dat')) as f:
+		with open('%s%s' % (path, 'emission_probability.txt')) as f:
 			self.__emission_probability = json.loads(f.readline())
 			# print self.__emission_probability
-		with open('%s%s' % (path, 'transition_probability.dat')) as f:
+		with open('%s%s' % (path, 'transition_probability.txt')) as f:
 			self.__transition_probability = json.loads(f.readline())
 			# print self.__transition_probability
         
@@ -101,11 +109,11 @@ class trainHmm(object):
     word_state = set()
 
     def save_state(self):
-        with open('start_state.dat', 'w') as f:
+        with open('start_state.txt', 'w') as f:
             f.write(json.dumps(self.__start_state))
-        with open('emission_probability.dat', 'w') as f:
+        with open('emission_probability.txt', 'w') as f:
             f.write(json.dumps(self.__emission_probability))
-        with open('transition_probability.dat', 'w') as f:
+        with open('transition_probability.txt', 'w') as f:
             f.write(json.dumps(self.__transition_probability))
 
     def add_line(self, line):
