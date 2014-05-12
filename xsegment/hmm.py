@@ -10,89 +10,90 @@ sys.setdefaultencoding('utf-8')
 import re
 
 
-
 class HSegment(object):
     __start_state = None
     __emission_probability = None
     __transition_probability = None
     __states = ['s', 'm', 'b', 'e']
-    
+    __split = re.compile('\\s+').split
     
     
     def __init__(self, model=os.path.join(os.path.abspath(os.path.dirname(__file__)),  'dict/')):
-		self.__load(model)
+        self.__load(model)
 
-
-    def split(self , sentence):
-        if not self.__split:
-            self.__split = re.compile('\\s+')
-        return self.__split
 
 
     def __load(self, path):
-		print path
-		if path:
-			if not path.endswith('/'):
-				path = path + '/'
-		with open('%s%s' % (path, 'start_state.txt')) as f:
-			self.__start_state = json.loads(f.readline())
-			# print self.__start_state
-		with open('%s%s' % (path, 'emission_probability.txt')) as f:
-			self.__emission_probability = json.loads(f.readline())
-			# print self.__emission_probability
-		with open('%s%s' % (path, 'transition_probability.txt')) as f:
-			self.__transition_probability = json.loads(f.readline())
-			# print self.__transition_probability
+        if path:
+            if not path.endswith('/'):
+                path = path + '/'
+        with open('%s%s' % (path, 'start_state.txt')) as f:
+            self.__start_state = json.loads(f.readline())
+        # print self.__start_state
+        with open('%s%s' % (path, 'emission_probability.txt')) as f:
+            self.__emission_probability = json.loads(f.readline())
+        # print self.__emission_probability
+        with open('%s%s' % (path, 'transition_probability.txt')) as f:
+            self.__transition_probability = json.loads(f.readline())
+        # print self.__transition_probability
         
     def __viterbi(self, obs):
-	    '''
-	    特比算法 摘自wiki 维特比算法
-	    '''
-	    # print obs
-	    V = [{}]
-	    path = {}
-	    for y in self.__states:
-	    	V[0][y] = self.__start_state[y] * \
-	    	self.__emission_probability[y][obs[0]]
-	    	path[y] = [y]
-	    for t in range(1, len(obs)):
-	    	V.append({})
-	    	newpath = {}
-	    	for y in self.__states:
-	    	    (prob, state) = max(
-	    	    	[(V[t - 1][y0] * self.__transition_probability[y0][y] * self.__emission_probability[y][obs[t]], y0) for y0 in self.__states])
-	    	    V[t][y] = prob
-	    	    newpath[y] = path[state] + [y]
-	        path = newpath
-	    (prob, state) = max([(V[len(obs) - 1][y], y) for y in self.__states])
-	    return (prob, path[state])
+        '''
+        特比算法 摘自wiki 维特比算法
+        '''
+        # print obs
+        V = [{}]
+        path = {}
+        for y in self.__states:
+            V[0][y] = self.__start_state[y] * \
+            self.__emission_probability[y][obs[0]]
+            path[y] = [y]
+        for t in range(1, len(obs)):
+            V.append({})
+            newpath = {}
+            for y in self.__states:
+                (prob, state) = max(
+                    [(V[t - 1][y0] * self.__transition_probability[y0][y] * self.__emission_probability[y][obs[t]], y0) for y0 in self.__states])
+                V[t][y] = prob
+                newpath[y] = path[state] + [y]
+            path = newpath
+        (prob, state) = max([(V[len(obs) - 1][y], y) for y in self.__states])
+        return (prob, path[state])
            
-        def segment(self , sentence):
-    	    if sentence :
-    		if not isinstance(sentence , unicode):
-    			sentence = sentence.decode('utf-8')
+    def __segment(self , sentence):
+        if sentence :
+           if not isinstance(sentence , unicode):
+               sentence = sentence.decode('utf-8')
+        __obs = self.__viterbi(sentence)[1]
+        # print __obs
+        word = []
+        __index = 0
+        __size = len(__obs)
+        while __index < __size:
+            if __obs[__index] == 's':
+                word.append(sentence[__index])
+                __index = __index + 1
+            elif __obs[__index] == 'b':
+                __word = []
+                while __index < __size and  __obs[__index] != 'e':
+                    __word.append(sentence[__index])
+                    __index = __index + 1
+                if __index < __size:
+                    __word.append(sentence[__index])
+                    word.append(''.join(__word))
+                    __index = __index + 1
+            else:
+                print __obs[__index]
+        return word
 
-    	    __obs = self.__viterbi(sentence)[1]
-    	    # print __obs
-    	    word = []
-    	    __index = 0
-    	    __size = len(__obs)
-    	    while __index < __size:
-    	    	if __obs[__index] == 's':
-    	    	    word.append(sentence[__index])
-    	    	    __index = __index + 1
-    	    	elif __obs[__index] == 'b':
-    	    	    __word = []
-    	    	    while __obs[__index] != 'e':
-    	    	    	__word.append(sentence[__index])
-    	    	    	__index = __index + 1
-    	    	    __word.append(sentence[__index])
-    	    	    word.append(''.join(__word))
-    	    	    __index = __index + 1
-    	        else:
-    	       	   print __obs[__index]
-    	    return word
 
+    def segment(self , sentence):
+        if not sentence:
+            return []
+        words  = []
+        for sen in self.__split(sentence.strip()):
+            words.extend(self.__segment(sen))
+        return words
 
 class trainHmm(object):
     state = defaultdict(float)
@@ -189,9 +190,9 @@ class trainHmm(object):
 
     
 if __name__ == '__main__':
-	h = HSegment()
-	print ' '.join(h.segment(u'理想很远大，现实很骨干'))
-	print ' '.join(h.segment(u'作为程序员来说！努力是个球！,世界杯开赛！梅西很犀利!,世界卫生组织宣布！我了个去!梅花盛开在三月!腊月是个神奇的日子！'))
+    h = HSegment()
+    print ' '.join(h.segment(u'理想很远大，现实很骨干'))
+    print ' '.join(h.segment(u'作为程序员来说！努力是个球！,世界杯 开赛！梅西很犀利!,世界卫生组织宣布！我了个去!梅花盛开在三月!腊月是个神奇的日子！'))
     # import os 
     # import re 
 
@@ -200,19 +201,19 @@ if __name__ == '__main__':
     # word = re.compile('/[a-z]+\s?')
     # diff = set()
     # for file_name in os.listdir("data/"):
-    # 	file_path = '%s%s' % ('data/' , file_name)
-    # 	with open(file_path) as f:
-    # 		content = f.readlines()
-    # 		try:
-    # 		    wd = content[2].split('：')[1].strip()
-    # 		except Exception,e:
-    # 			print file_path , e
-    # 		for line in content[6:]:
-    # 			line = line.strip().replace('[%s]' % wd , wd).split("\t")[2]
-    # 			if line in diff:
-    # 				continue
-    # 			diff.add(line)
-    # 			t.add_line(' '.join(word.split(line)))
+    #     file_path = '%s%s' % ('data/' , file_name)
+    #     with open(file_path) as f:
+    #     content = f.readlines()
+    #     try:
+    #         wd = content[2].split('：')[1].strip()
+    #     except Exception,e:
+    #     print file_path , e
+    #     for line in content[6:]:
+    #     line = line.strip().replace('[%s]' % wd , wd).split("\t")[2]
+    #     if line in diff:
+    #     continue
+    #     diff.add(line)
+    #     t.add_line(' '.join(word.split(line)))
 
     # t.train('pku_training.utf8')
     # t.translte()
