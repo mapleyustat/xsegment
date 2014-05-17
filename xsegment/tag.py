@@ -176,6 +176,7 @@ if __name__ == '__main__':
     # print h.viterbi( [u'我' , u'爱 ' , u'你' ])
     # print h.viterbi( [u'恭喜' , u'你' , u'发财'])
     print h.tag('我 爱 我 的 祖国 !')
+    p
     
     # import os 
     # import re 
