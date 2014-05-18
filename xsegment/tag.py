@@ -55,7 +55,7 @@ class HSpeech(object):
             newpath = {}
             for y in self.__states:
                 prob = 0.
-                state = None
+                state = self.__states[0]
                 for y0 in self.__states:
                     if self.__emission_probability[y].has_key(obs[t]):
                         __prob = V[t - 1][y0] * self.__transition_probability[y0][y] * self.__emission_probability[y][obs[t]]
@@ -71,17 +71,15 @@ class HSpeech(object):
         return (prob, path[state])
 
     def tag(self, segment_words,split_word = ' '):
-        __obs = segment_words
         if segment_words:
             if isinstance(segment_words , str):
-                __obs = segment_words.decode('utf-8').split(split_word)
+                segment_words = segment_words.decode('utf-8').split(split_word)
             elif isinstance(segment_words , unicode):
-                __obs = segment_words.split(split_word)
+                segment_words = segment_words.split(split_word)
             elif not isinstance(segment_words , (list , tuple)):
                 raise Exception,'type erro!'
-
-            state = self.__viterbi(__obs)[1]
-            return [(__obs[i] , state[i]) for i in range(len(__obs))]
+            state = self.__viterbi(segment_words)[1]
+            return [(segment_words[i] , state[i]) for i in range(len(segment_words))]
         return None
 
 
