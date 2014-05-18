@@ -71,7 +71,7 @@ class HSpeech(object):
         return (prob, path[state])
 
     def tag(self, segment_words,split_word = ' '):
-        __obs = []
+        __obs = segment_words
         if segment_words:
             if isinstance(segment_words , str):
                 __obs = segment_words.decode('utf-8').split(split_word)
@@ -79,8 +79,9 @@ class HSpeech(object):
                 __obs = segment_words.split(split_word)
             elif not isinstance(segment_words , (list , tuple)):
                 raise Exception,'type erro!'
+
             state = self.__viterbi(__obs)[1]
-            return ['%s/%s' % (__obs[i] , state[i]) for i in range(len(__obs))]
+            return [(__obs[i] , state[i]) for i in range(len(__obs))]
         return None
 
 
@@ -175,8 +176,7 @@ if __name__ == '__main__':
     h = HSpeech()
     # print h.viterbi( [u'我' , u'爱 ' , u'你' ])
     # print h.viterbi( [u'恭喜' , u'你' , u'发财'])
-    print h.tag('我 爱 我 的 祖国 !')
-    p
+    print h.tag('我 早饭 我 的 祖国 !')
     
     # import os 
     # import re 

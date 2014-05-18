@@ -2,6 +2,8 @@
 #!/usr/bin/env python
 
 import sys
+from ZooSegment import FMM
+from tag import HSpeech
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -23,12 +25,11 @@ def enum(args, start=0):
 ITEM_LOCATION = enum('BEGIN MEDIM END NONE')
 
 
-class worditem(object):
+class WordItem(object):
 
-    def __init__(self, word, tag, weight, isKeyWord):
+    def __init__(self, word, tag, isKeyWord=False):
         self.word = word
         self.tag = tag
-        self.weight = weight
         self.isKeyWord = isKeyWord
 
     def __str__(self):
@@ -50,13 +51,14 @@ class Sentence(object):
     score 关键句打分
     '''
 
-    def __init__(self, oristring, index, loc, items=None, keywords=None, score=0.):
+    def __init__(self, oristring, index, loc, words=None, items=None, keywords=None, score=0.):
         self.index = index
         self.items = items
         self.score = score
         self.keywords = keywords
         self.oristring = oristring
         self.loc = loc
+        self.words = words
 
     def __getitem__(self, key):
         return self.__getattr__(key)
@@ -70,16 +72,18 @@ class Sentence(object):
 
 class Summary():
 
-    segment = None
-    tag = None
+    __segment = None
+    __tag = None
+
     def __init__(self):
         pass
 
     def summary(self, content, title):
         sentences = self.split_sentence(content)
         sentences.extend(self.split_sentence(title))
-        for i in range(len(sentences)):
-            pass
+        self.segment(sentences)
+        for sen in sentences:
+            print sen.items
 
     def split_sentence(self, content):
         if content:
@@ -116,14 +120,14 @@ class Summary():
             return sentences
         return []
 
-    def segment(self, content):
+    def segment(self, sentences):
         '''
         content : 每个要分词
         返回值：
         '''
         pass
 
-    def extractKeyWord(self, content, topN):
+    def extractKeyWord(self, sentences, topN=20):
         '''
         抽取关键词接口
         '''
@@ -135,7 +139,7 @@ class Summary():
         '''
         pass
 
-    def sentences_filter(self, sentences, socre):
+    def sentences_filter(self, sentences, order=None):
         '''
         sentences : 每个文档的句子集合
         score : 阈值
@@ -143,11 +147,30 @@ class Summary():
         '''
         if sentences:
             if isinstance(sententce, list) and len(sententces) > 0:
-                return sorted([sentence for sentence in sententces if sentence.score > score], lambda x: x.index)
+                return sorted(sentences, lambda x: x[order])
         raise TypeError, 'sentences must be list and item is sententce'
 
 
+
+class SimpleSummary(Summary):
+
+    __segment = FMM()
+    __tag = HSpeech()
+
+
+    def segment(self ,sentences):
+        for i in range(len(sentences)):
+            sentences[i].words = self.__segment.segment(sentences[i].oristring)
+            items = []
+            for __word in self.__tag.tag(sentences[i].words):
+                items.append(WordItem(__word[0] , __word[1]))
+            sentences[i].items = items
+
+
+
+
+
 if __name__ == '__main__':
-    s = Summary()
-    for i in s.split_sentence('我说你的问题 。3.16 我不知道啊啊！怎么了？ 说哈！这个问题;'):
+    s = SimpleSummary()
+    for i in s.summary('我说你的问题 。3.16 我不知道啊啊！怎么了？ 说哈！这个问题;' , '测试'):
         print i
