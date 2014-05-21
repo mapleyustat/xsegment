@@ -209,12 +209,12 @@ class SimpleSummary(Summary):
     def score(self, sentence):
         __score = 0.
         if sentence.loc == ITEM_LOCATION.BEGIN:
-            __score += 8
+            __score += 10
         if sentence.loc == ITEM_LOCATION.END:
-            __score += 4
-        __score = sentence.keywords * 60.0 / sentence.wordLen
-        if sentence.oristring[-1] in [ '?' ,'!' , '?' ,'!']:
-            __score -= 3
+            __score += 6
+        __score = sentence.keywords * 80.0 / sentence.wordLen
+        if sentence.oristring[-1] in [ '?' ,'!' , '？' ,'!']:
+            __score -= 100
         return __score
 
 

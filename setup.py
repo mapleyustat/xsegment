@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 kw = dict(
     name='xsegment',
-    version='0.1.0',
+    version='0.1.1',
     description='chinese words segment use regular ',
     author='intoblack',
     author_email='intoblack86@gmail.com',
