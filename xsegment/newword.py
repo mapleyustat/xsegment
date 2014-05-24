@@ -16,6 +16,7 @@ split = re.compile(ur'[^\u4E00-\u9FA5a-zA-Z0-9]+').split
 
 def recognition(file_name , window = 3):
     word_count = defaultdict(int)
+    word_relate = {}
     with open(file_name) as f:
         for line in f.readlines():
             line = line.strip()
@@ -24,6 +25,7 @@ def recognition(file_name , window = 3):
                 for word in split(line):
                     for i in range(window,len(word)+ 1):
                         word_count[word[i - window : i]] += 1
+                        
     return sorted(word_count.items(), key = lambda x : x[1] , reverse = True)                        
 
 
@@ -31,5 +33,5 @@ def recognition(file_name , window = 3):
 
 
 if __name__ == '__main__':
-    for i in recognition('/home/lixuze/12.txt' , window = 2)[:100]:
+    for i in recognition('/home/lixuze/12.txt' , window = 2)[:1000]:
         print i[0] , i[1]

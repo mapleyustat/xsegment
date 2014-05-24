@@ -14,6 +14,10 @@ sys.setdefaultencoding('utf-8')
 
 
 def enum(args, start=0):
+    '''
+    enum 枚举实现　－　＞　使用方式　　enmu('ENUM1 ... Enum2 .. EnumN')
+
+    '''
     class Enum(object):
         __slots__ = args.split()
 
@@ -23,7 +27,7 @@ def enum(args, start=0):
 
     return Enum()
 
-ITEM_LOCATION = enum('BEGIN MEDIM END NONE')
+ITEM_LOCATION = enum('BEGIN MEDIM END NONE') #位置变量
 
 
 class WordItem(object):
@@ -54,10 +58,12 @@ class Sentence(object):
     items 分词信息
     keywords 关键词数目
     score 关键句打分
+    words 分词
+    wordLen 句子含有的词数目　
     '''
 
     def __init__(self, oristring, index, loc, words=None, items=None, keywords=None, wordLen=0, score=0.):
-        self.index = index
+        self.index = index 
         self.items = items
         self.score = score
         self.keywords = keywords
@@ -67,6 +73,7 @@ class Sentence(object):
         self.wordLen = wordLen
 
     def __str__(self):
+        #返回字符串功能　str() 
         msg = []
         for __key, __val in self.__dict__.items():
             if isinstance(__val, (list, tuple)):
@@ -78,24 +85,34 @@ class Sentence(object):
 
 
 class Summary():
+    '''
+    基于新闻的摘要功能　
+    主要提取新闻关键句子　按照文章顺序输出
+
+    '''
 
     def __init__(self):
         pass
 
-    def summary(self, content, title, sentence_len=5):
-        sentences = self.split_sentence(content)
-        # return sentences
-        sentences.extend(self.split_sentence(title))
-        self.segment(sentences)
-        self.extractKeyWord(sentences, topN=30)
-        self.score_sententces(sentences)
-        sentences = self.sentences_filter(sentences, 'score', reverse=True)
-        if len(sentences) > sentence_len:
-            sentences = sentences[: sentence_len]
+    def summary(self, content, title, sentence_len=5 , pagraph_split = '\r\n'):
+        '''
+        摘要主要接口
+        content  新闻
+        title 新闻的标题
+        sentence_len 返回的句子数目
+        '''
+        sentences = self.split_sentence(content , pagraph_split) #分割句子　－＞　将文本分割为　Sententce　ｌｉｓｔ 
+        sentences.extend(self.split_sentence(title , pagraph_split)) # 是否要把标题作为句子切分　有待考虑
+        self.segment(sentences) # 分词　将所有句子对象转换为分词
+        self.extractKeyWord(sentences, topN=30) #抽取关键词　
+        self.score_sententces(sentences)#根据　句子信息对文章打分
+        sentences = self.sentences_filter(sentences, 'score', reverse=True) #根据句子得分高低排序　得分高的在前面
+        if len(sentences) > sentence_len: #判断　是否超过需要的句子数目
+            sentences = sentences[: sentence_len] #句子数目
         sentences = self.sentences_filter(sentences, 'index')
-        return sentences
+        return (title,sentences)
 
-    def split_sentence(self, content):
+    def split_sentence(self, content , split = '\r\n'):
         '''
         对输入的文本切分句子
 
@@ -105,7 +122,7 @@ class Summary():
                 content = content.decode('utf-8')
             sentences = []
             index = 0
-            for pagraph in content.split('\r\n'):
+            for pagraph in content.split(split): # 段落分隔符　是/r/n
                 loc = ITEM_LOCATION.MEDIM
                 split_last = 0
                 save_sentences_len = len(sentences)
@@ -175,12 +192,20 @@ class Summary():
 
 class SimpleSummary(Summary):
 
-    __segment = FMM()
-    __tag = HSpeech()
-
-    def __init__(self):
-        pass
-
+    '''
+    默认自动摘要实现
+    分词接口　: FMM  xsegment 或者含有接口为　segment　分词实现类别　　返回值为ｌｉｓｔ　或者　ｔｕｐｌｅ
+    ｔａｇ　：　名词词性分析 现在直接调用　本人编写的词性标注类实现
+    '''
+    def __init__(self , segment = None , tag = None):
+        if segment:
+            self.__segment = segment
+        else:
+            self.__segment = FMM()
+        if tag:
+            self.__tag = tag
+        else:
+            self.__tag = HSpeech()
     def segment(self, sentences):
         for i in range(len(sentences)):
             sentences[i].words = self.__segment.segment(sentences[i].oristring)
@@ -194,10 +219,11 @@ class SimpleSummary(Summary):
         content = []
         for i in range(len(sentences)):
             content.extend(
-                [item.word for item in sentences[i].items if item.tag in ['n', 'r', 'v'] and len(item.word) > 1])
+                [item.word for item in sentences[i].items if item.tag in ['n', 'r', 'v'] and len(item.word) > 1 and i > 0])
         __window = TextRank1.create_word_window(content, 5, weight=True)
         __score_map = TextRank1.textrank(__window, 100)
         keywords = [i[0] for i in TextRank1.sort_score(__score_map, topN)]
+        keywords.extend([item.word for item in sentences[1].items if item.tag in ['n' , 'r' , 'v']])
         for i in range(len(sentences)):
             keyWordsLen = 0
             for j in range(len(sentences[i].items)):
@@ -223,5 +249,5 @@ if __name__ == '__main__':
     x = None
     with open('/home/lixuze/test.txt') as f:
         x = ''.join([line for line in f.readlines() if line.strip() != ''])
-    for i in s.summary(x, '测试'):
+    for i in s.summary(x, '测试')[1]:
         print i.oristring
