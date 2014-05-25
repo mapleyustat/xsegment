@@ -13,6 +13,9 @@ sys.setdefaultencoding('utf-8')
 '''
 
 
+
+
+
 def enum(args, start=0):
     '''
     enum 枚举实现　－　＞　使用方式　　enmu('ENUM1 ... Enum2 .. EnumN')
@@ -242,6 +245,19 @@ class SimpleSummary(Summary):
         if sentence.oristring[-1] in [ '?' ,'!' , '？' ,'!']:
             __score -= 100
         return __score
+
+    def __cos(self , sentence1 , sentence2 , split_word = ' '):
+        if sentence1 and sentence2:
+            if isinstance(sentence1 , (str ,unicode)) and isinstance(sentence2 , (str , unicode)):
+                sentence1 = [word for word in sentence1.split(split_word)]
+                sentence2 = [word for word in sentence2.split(split_word)]
+            else if isinstance(sentence1  , (list , tuple)) and isinstance(sentence2 , (list , tuple)):
+                pass
+            else:
+                raise TypeError
+            
+
+
 
 
 if __name__ == '__main__':
