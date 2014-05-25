@@ -1,8 +1,5 @@
-#coding=utf-8
+# coding=utf-8
 #!/usr/bin/env python
-
-
-
 
 
 from collections import defaultdict
@@ -17,49 +14,69 @@ vsm 空间向量模型
 
 '''
 
+
 class Vector(object):
 
-
-    __vector = {} #词 - > 文档 -> 词频
-    __doc = set() #ｄｏｃ　ｓｅｔ　只为了防止重复加入新的文档
-    __word = {} #词序号信息 甚至我都可以不加入这个信息
-    __index = 0 #这个只是配合词序号信息的记录值
-
+    __vector = {}  # 词 - > 文档 -> 词频
+    __doc = set()  # ｄｏｃ　ｓｅｔ　只为了防止重复加入新的文档
+    __tf_idf = None
 
     def __init__(self):
         pass
 
-    def add_doc(self , doc_name , doc , split_word = ' '):
-        if doc and doc_name and isinstance(doc_name , (str , unicode)) and len(doc_name)  > 0:
+    def add_doc(self, doc_name, doc, split_word=' '):
+        if doc and doc_name and isinstance(doc_name, (str, unicode)) and len(doc_name) > 0:
             if doc_name in self.__doc:
-                raise TypeError , 'doc_name :' + doc_name + ' has exist in this Vector' 
-            if isinstance(doc , (str , unicode)):
+                raise TypeError, 'doc_name :' + doc_name + ' has exist in this Vector'
+            if isinstance(doc, (str, unicode)):
                 doc = doc.split(split_word)
-            elif not isinstance(doc , (list , tuple )):
+            elif not isinstance(doc, (list, tuple)):
                 raise TypeError
             for word in doc:
                 if not self.__vector.has_key(word):
-                    self.__vector[word] =  defaultdict(int)
-                    self.__word[word] = self.__index 
-                    self.__index = self.__index + 1
+                    self.__vector[word] = defaultdict(int)
                 self.__vector[word][doc_name] += 1
-            return 
-        raise TypeError , 'doc is null or doc_name is null or doc_name isn\'t str '
+            self.__doc.add(doc_name)
+            return
+        raise TypeError, 'doc is null or doc_name is null or doc_name isn\'t str '
 
-    def toidf(self):
+    def totfidf(self):
         doc_count = len(self.__doc)
-        idf = defaultdict(float)
+        self.__tf_idf = {}
         for __word in self.__vector.keys():
-            idf[__word] = 
-        return tf_idf
+            idf = math.log((1.0 + doc_count) / len(self.__vector[__word]), 2)
+            for __doc_name, __count in self.__vector[__word].items():
+                if not self.__tf_idf.has_key(__doc_name):
+                    self.__tf_idf[__doc_name] = defaultdict(float)
+                self.__tf_idf[__doc_name][__word] = __count * idf
+        return self.__tf_idf
 
+    def similarty(self, doc_name1, doc_name2):
+        if not (doc_name1 and doc_name2):
+            raise TypeError
 
+        if self.__tf_idf.has_key(doc_name1) and self.__tf_idf.has_key(doc_name2):
+            __m1 = 0.
+            for __val in self.__tf_idf[doc_name1].values():
+                __m1 += __val * __val
+            __m1 = math.sqrt(__m1)
+            __m2 = 0.
+            for __val in self.__tf_idf[doc_name2].values():
+                __m2 += __val * __val
+            __m2 = math.sqrt(__m2)
+            word_set = set(self.__tf_idf[
+                doc_name1].keys())& set(self.__tf_idf[doc_name2].keys())
+            __up = 0.
+            for word in word_set:
+                __up += (self.__tf_idf[doc_name1][
+                         word] * self.__tf_idf[doc_name2][word])
+            return __up / __m1 * __m2
 
 
 if __name__ == '__main__':
-    
 
     v = Vector()
-    v.add_doc('a' , 'a b c d c a')
-    v.add_doc('b' , 'a c d e f a')
-
+    v.add_doc('a', 'a b c d c a')
+    v.add_doc('b', 'a b c d c a')
+    print v.totfidf()
+    print v.similarty('a' , 'b')
