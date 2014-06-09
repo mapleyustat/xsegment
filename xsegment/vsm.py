@@ -20,6 +20,8 @@ class Vector(object):
     __vector = {}  # 词 - > 文档 -> 词频
     __doc = set()  # ｄｏｃ　ｓｅｔ　只为了防止重复加入新的文档
     __tf_idf = None
+    __idf = defaultdict(float)
+    __newfish = False #
 
     def __init__(self):
         pass
@@ -37,23 +39,28 @@ class Vector(object):
                     self.__vector[word] = defaultdict(int)
                 self.__vector[word][doc_name] += 1
             self.__doc.add(doc_name)
+            self.__newfish = True
             return
         raise TypeError, 'doc is null or doc_name is null or doc_name isn\'t str '
 
-    def totfidf(self):
+    def __totfidf(self):
         doc_count = len(self.__doc)
         self.__tf_idf = {}
         for __word in self.__vector.keys():
             idf = math.log((1.0 + doc_count) / len(self.__vector[__word]), 2)
+            self.__idf[word] = idf
             for __doc_name, __count in self.__vector[__word].items():
                 if not self.__tf_idf.has_key(__doc_name):
                     self.__tf_idf[__doc_name] = defaultdict(float)
                 self.__tf_idf[__doc_name][__word] = __count * idf
+        self.__newfish = False
         return self.__tf_idf
 
     def similarty(self, doc_name1, doc_name2):
         if not (doc_name1 and doc_name2):
             raise TypeError
+        if self.__newfish:
+            self.__totfidf()
 
         if self.__tf_idf.has_key(doc_name1) and self.__tf_idf.has_key(doc_name2):
             __m1 = 0.
@@ -65,12 +72,15 @@ class Vector(object):
                 __m2 += __val * __val
             __m2 = math.sqrt(__m2)
             word_set = set(self.__tf_idf[
-                doc_name1].keys())& set(self.__tf_idf[doc_name2].keys())
+                doc_name1].keys()) & set(self.__tf_idf[doc_name2].keys())
             __up = 0.
             for word in word_set:
                 __up += (self.__tf_idf[doc_name1][
                          word] * self.__tf_idf[doc_name2][word])
             return __up / __m1 * __m2
+
+    def query(self, doc):
+        pass
 
 
 if __name__ == '__main__':
@@ -78,5 +88,6 @@ if __name__ == '__main__':
     v = Vector()
     v.add_doc('a', 'a b c d c a')
     v.add_doc('b', 'a b c d c a')
+    v.add_doc('c', 'c d f e r a c')
     print v.totfidf()
-    print v.similarty('a' , 'b')
+    print v.similarty('a', 'b')

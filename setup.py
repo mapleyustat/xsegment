@@ -12,8 +12,8 @@ kw = dict(
     platforms='all platform',
     packages = find_packages(),
     package_data = {
-        '': ['*.txt'],
-        'dict': ['*.txt'],
+        '': ['*.*'],
+        'dict': ['*.*'],
     }
 )
 
